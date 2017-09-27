@@ -22,7 +22,7 @@ containers.create(
 	depth=60
 )
 
-p20rack = containers.load('tiprack-200ul-6x12', 'B2', 'p20_rack')
+p20rack = containers.load('tiprack-200ul-6x12', 'E1', 'p20_rack')
 
 #Create 3x6 2ml tube rack for DNA samples
 containers.create(
@@ -33,7 +33,7 @@ containers.create(
 	depth=40
 )
 
-source_tubes = containers.load('3x6-tube-rack-2ml', 'C3', 'source_rack')
+source_tubes = containers.load('3x6-tube-rack-2ml', 'C1', 'source_tubes')
 
 #define pipettes
 p20 = instruments.Pipette(
@@ -73,31 +73,15 @@ water_source = source_tubes.wells('A1')
 reagent_2_source = source_tubes.wells('C1')
 reagent_1_sources = source_tubes.wells('A2', to= 'C2')
 
-row_length = len(output.rows(0))
-
-for i in range(3):
-	dest_index = (i % row_length) + (int(i / row_length) * row_length * 16)
-	p20.distribute(
-    	i, reagent_1_sources.wells(i), output.wells(dest_index, length=16))
-
 #distribute water
-p200.distribute(
-	water_volumes,
-	water_source,
-	output.wells('A1', length=total_all),
-	blow_out=True,
-	touch_tip=True
-)
-
+for i in water_volumes:
+	p200.distribute(
+		i, water_source, output.wells('A1', length=(replicates*num_reagent_1), skip=8))
+		
 #distribute reagent_1
-p20.transfer(
-	reagent_1_volumes,
-	reagent_1_sources,
-	output.wells('A1', length=reagent_1_replicates),
-	mix_after=(3, 7),
-	blow_out=True,
-	touch_tip=True
-)
+for i in reagent_1_volumes:
+	p20.distribute(
+		i, reagent_1_sources, output.wells('A1', length=(replicates*num_reagent_1), skip=8))
 
 #distribute reagent_2
 p20.transfer(
@@ -108,8 +92,3 @@ p20.transfer(
 	blow_out=True,
 	touch_tip=True
 )
-
-#mix
-p200.pick_up_tip()
-p200.mix('A1', length=total_all),
-p200.drop_tip()
