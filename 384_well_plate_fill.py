@@ -73,6 +73,13 @@ water_source = source_tubes.wells('A1')
 reagent_2_source = source_tubes.wells('C1')
 reagent_1_sources = source_tubes.wells('A2', to= 'C2')
 
+row_length = len(output.rows(0))
+
+for i in range(3):
+	dest_index = (i % row_length) + (int(i / row_length) * row_length * 16)
+	p20.distribute(
+    	i, reagent_1_sources.wells(i), output.wells(dest_index, length=16))
+
 #distribute water
 p200.distribute(
 	water_volumes,
@@ -106,4 +113,3 @@ p20.transfer(
 p200.pick_up_tip()
 p200.mix('A1', length=total_all),
 p200.drop_tip()
-	
